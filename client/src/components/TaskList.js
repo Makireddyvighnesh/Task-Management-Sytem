@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Filter, { sortedItems } from './filter';
+import DueDateCalendar from './DueDateCalender';
+
+
 
 function TaskList() {
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', description: '', completed: false });
+  const [newTask, setNewTask] = useState({ title: '', description: '', dueDate:'', priority:'low', completed: false });
+  
   const [editingTask, setEditingTask] = useState(null);
+  const [filter, setFilter]=useState(false);
+  const [addTask, setAddTask]=useState(false);
 
   useEffect(() => {
     // Fetch tasks from the backend when the component mounts
@@ -15,19 +22,23 @@ function TaskList() {
     try {
       const response = await axios.get('http://localhost:8080/api/tasks'); // Replace with your API URL
       setTasks(response.data);
+     
       console.log(response.data);
+      console.log(typeof(response.data[1].dueDate))
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
   };
 
   const createTask = async () => {
+    setAddTask(false);
     try {
       const response = await axios.post('http://localhost:8080/api/tasks', newTask);
       setTasks([...tasks, response.data]);
-      setNewTask({ title: '', description: '', completed: false });
-    } catch (error) {
-      console.error('Error creating task:', error);
+      console.log(typeof(newTask.dueDate))
+      setNewTask({ title: '', description: '',dueDate:'', priority:'low', completed: false });
+    } catch (err) {
+      console.log('Error creating task:', err);
     }
   };
 
@@ -52,36 +63,63 @@ function TaskList() {
     }
   };
 
+  const handlePriorityChange = (event)=>{
+    setNewTask({...newTask, priority: event.target.value});
+  }
+
+  const handleSortPriority=(sortedItems)=>{
+    setTasks(sortedItems);
+    
+  }
+
+  const handleDateTimeSelected = (dateTime) => {
+    setNewTask({...newTask, dueDate:dateTime});
+    
+    console.log(typeof(dateTime));
+  };
+
   return (
     <div>
-      <h1>Task Management App</h1>
-
-      {/* Task List */}
+      <h1>Task Management System</h1>
+      <Filter tasks={tasks} onSortPriority={handleSortPriority}/>
       <div>
         <h2>Task List</h2>
         <ul>
           {tasks.map(task => (
             <li key={task._id}>
-              <strong>{task.title}</strong>
-              <p>{task.description}</p>
+ 
               {!editingTask || editingTask._id !== task._id ? (
-                <div>
-                  <button onClick={() => setEditingTask(task)}>Edit</button>
-                  <button onClick={() => deleteTask(task._id)}>Delete</button>
+                <div className='Container'>
+                <div className='task'>
+                  <div className='task-name'>
+                  <strong>{task.title}</strong>
+                  </div>
+                  
+                  <div className='buttonLayout hide' >
+                    <button onClick={() => setEditingTask(task)}>Edit</button>
+                    <button onClick={() => deleteTask(task._id)}>Delete</button>
+                  </div>
+                </div>
+                
+                <p>{task.description}</p>
+                 
                 </div>
               ) : (
                 <div>
-                  <input
-                    type="text"
-                    value={editingTask.title}
-                    onChange={e => setEditingTask({ ...editingTask, title: e.target.value })}
-                  />
-                  <input
-                    type="text"
-                    value={editingTask.description}
-                    onChange={e => setEditingTask({ ...editingTask, description: e.target.value })}
-                  />
-                  <button onClick={updateTask}>Save</button>
+                <form >
+                    <input
+                      type="text"
+                      value={editingTask.title}
+                      onChange={e => setEditingTask({ ...editingTask, title: e.target.value })}
+                    />
+                    <input
+                      type="text"
+                      value={editingTask.description}
+                      onChange={e => setEditingTask({ ...editingTask, description: e.target.value })}
+                    />
+                    
+                    <button onClick={updateTask}>Save</button>
+                  </form>
                 </div>
               )}
             </li>
@@ -89,23 +127,41 @@ function TaskList() {
         </ul>
       </div>
 
-      {/* Create Task Form */}
-      <div>
-        <h2>Create a Task</h2>
-        <input 
-          type="text"
-          placeholder="add the task"
-          value={newTask.title}
-          onChange={e => setNewTask({ ...newTask, title: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="add the desciption"
-          value={newTask.description}
-          onChange={e => setNewTask({ ...newTask, description: e.target.value })}
-        />
-        <button onClick={createTask}>Create Task</button>
+     
+      <div >
+       {!addTask && (<button onClick={()=>{setAddTask(true)} }>Add task</button>)}
+      { addTask && (
+        <div className='container'>
+          <input 
+            type="text"
+            placeholder="Task name"
+            value={newTask.title}
+            onChange={e => setNewTask({ ...newTask, title: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Desciption"
+            value={newTask.description}
+            onChange={e => setNewTask({ ...newTask, description: e.target.value })}
+          />
+        
+          <select id="taskPriority" value={newTask.priority}  onChange={handlePriorityChange}>
+           
+            <option value="high">P1-Highest</option>
+            <option value="medium">P2-Medium</option>
+            <option value="low">P3-Low</option>
+          </select>
+          <DueDateCalendar onDateTimeSelected={handleDateTimeSelected} className="due"/>
+       
+          <button onClick={createTask}>Create Task</button>
+        </div>
+        
+
+       )}
+
       </div>
+      
+      
     </div>
   );
 }

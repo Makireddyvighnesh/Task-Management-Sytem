@@ -1,0 +1,85 @@
+.container{
+           
+    margin:20px 20px 10px 100px;
+    border: 1px solid lightgray;
+    padding: 10px 2px 10px 10px;
+    width:50%;
+    border-radius: 2%;
+ }
+ #taskPriority{
+    padding: 10px 20px;
+    font-weight: bold;
+    color:#808080;
+    margin:5px;
+    border: 1px solid #ddd;
+    display: inline;
+
+ }
+/* Your CSS file */
+/* Your CSS file */
+.task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: none;
+    position: relative; /* Required for absolute positioning */
+    cursor: pointer;
+  }
+  
+  .task-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .buttonLayout {
+    display: none;
+    gap: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  
+  .Container:hover .buttonLayout {
+    display: flex;
+  }
+  
+
+  
+ input {
+     color: #808080;
+     display: block;
+     font-weight: bold;
+     font-style: Sans-serif;
+     border-width: 0;
+     height:30px;
+     width:260px;
+ }
+ .due{
+    display:inline;
+ }
+ button {
+border: 1px solid #ddd; /* Light border color */
+background-color: #fff; /* White background color */
+color: #808080; /* Default text color */
+font-weight: bold; /* Bold text */
+padding: 10px 20px;
+border-radius: 5px; /* Rounded corners */
+cursor: pointer; /* Show pointer cursor on hover */
+transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+}
+
+button:hover {
+background-color: #F0F0F0; /* Light black background on hover */
+color: black; /* White text color on hover */
+}
+
+ input:focus {
+     outline:none;
+ }
+
+ h1{
+     margin-left: 10px;
+ }

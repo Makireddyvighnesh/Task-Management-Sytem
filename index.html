@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Due Date Calendar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <h1>Task Due Date</h1>
+    <input type="text" id="dueDateInput" placeholder="Select due date">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        flatpickr("#dueDateInput", {
+            dateFormat: "Y-m-d",
+            enableTime: false,
+            onChange: function(selectedDates, dateStr) {
+                // This function is called when a date is selected
+                console.log("Selected Due Date:", dateStr);
+                // You can use dateStr to store or process the selected due date.
+            },
+        });
+    </script>
+</body>
+</html>

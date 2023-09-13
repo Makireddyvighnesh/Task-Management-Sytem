@@ -16,25 +16,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/taskDB')
     console.error("Error connecting to MongoDB:", error);
   });
 
-// const taskSchema = new mongoose.Schema({
-//     title: {
-//         type: String,
-//         required: true,
-//     },
-//     description: {
-//         type: String,
-//         default: '',
-//     },
-//     dueDate: {
-//         type: Date,
-//     },
-//     completed: {
-//         type: Boolean,
-//         default: false,
-//     },
-// });
-
-// const Task = mongoose.model('Task', taskSchema);
 
 app.get('/', (req, res) => {
     res.send("Hello World");
@@ -43,6 +24,7 @@ app.get('/', (req, res) => {
 app.get('/api/tasks', async (req, res) => {
     try {
         const tasks = await Task.find();
+        console.log(tasks);
         res.status(200).json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Error retrieving tasks' });
@@ -51,10 +33,13 @@ app.get('/api/tasks', async (req, res) => {
 
 app.post('/api/tasks', async (req, res) => {
     try {
-        const { title, description, completed } = req.body;
-        const task = new Task({ title, description, completed });
+        const { title, description,dueDate, priority, completed } = req.body;
+        if(req.body.priority==null){
+            console.log("null n")
+        }
+        const task = new Task({ title, description, dueDate, priority, completed });
         const savedTask = await task.save();
-        console.log("Success");
+        console.log(task);
         res.status(200).json(savedTask);
     } catch (error) {
         res.status(500).json({ error: 'Error creating a task' });
@@ -63,11 +48,11 @@ app.post('/api/tasks', async (req, res) => {
 
 app.put('/api/tasks/:id', async (req, res) => {
     try {
-        const { title, description, completed } = req.body;
+        const { title, description,dueDate, priority, completed } = req.body;
         const updateTask = await Task.findByIdAndUpdate(
             req.params.id,
             {
-                title, description, completed
+                title, description,dueDate, priority, completed
             },
             { new: true }
         );
