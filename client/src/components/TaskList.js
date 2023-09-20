@@ -1,42 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Filter, { sortedItems } from './filter';
-import DueDateCalendar from './DueDateCalender';
-import Progress from './progress';
-import Home from './Home';
-import Search from './Search';
-import Profile from './Profile';
+import Filter from './filter.js';
+import DueDateCalendar from './DueDateCalender.js';
+import Task from './addTask.js';
 
 function TaskList() {
-  const setDefault=()=>{
-    const now = new Date();
-    const curr=new Date(now.getTime() + 12 * 60 * 60 * 1000);;
-    console.log(typeof(curr), "called")
-    return curr;
-  }
+ 
 
   const [tasks, setTasks] = useState([]);
-  const [newTask, setNewTask] = useState({ title: '', description: '', dueDate:setDefault(), priority:'low', completed: false });
-  console.log(setDefault())
-  const [resetTasks, setResetTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
-  const [addTask, setAddTask]=useState(false);
+
   const [sortType, setSortType]=useState(()=>{
     const storedType=localStorage.getItem('type');
     return storedType?JSON.parse(storedType):{sortedType:"default"};
   })
   const [fillter, setFilter] =useState(()=>{
-  const storedFilter = localStorage.getItem('filter');
-  return storedFilter?JSON.parse(storedFilter):{state:false};
-  });
+    const storedFilter = localStorage.getItem('filter');
+    return storedFilter?JSON.parse(storedFilter):{state:false};
+    });
+
+    useEffect(()=>{
+      localStorage.setItem('filter', JSON.stringify(fillter));
+      },[fillter])
 
   useEffect(() => {
     fetchTasks();
   },[]);
 
- useEffect(()=>{
-  localStorage.setItem('filter', JSON.stringify(fillter));
- },[fillter])
+
 
  useEffect(()=>{
   localStorage.setItem('type',JSON.stringify(sortType));
@@ -72,11 +63,11 @@ return [...tasks].slice().sort((task1, task2) => {
 };
 
 const fetchTasks = async () => {
+  console.log(tasks);
   try {
     const response = await axios.get('http://localhost:8080/api/tasks');
     // const sortedTasks = fillter.state ? sortTasksByPriority(response.data) : response.data;
     let sortedTasks;
-    alert(fillter.state)
     if(fillter.state){
       if(sortType.sortedType==='priority'){
         sortedTasks=sortTasksByPriority(response.data);
@@ -97,34 +88,6 @@ const fetchTasks = async () => {
 
 
 
-const createTask = async () => {
-  setAddTask(false);
-  alert(fillter.state)
-  
-  try {
-    const response = await axios.post('http://localhost:8080/api/tasks', newTask);
-    const totalTasks=[...tasks,response.data];
-    let sortNewTask;
-    if(fillter.state){
-      if(sortType.sortedType==='priority'){
-        sortNewTask=sortTasksByPriority(totalTasks);
-      } else if(sortType.sortedType==='dueDate'){
-        alert("entered")
-        sortNewTask=sortByDueDate(totalTasks);
-      } else{
-        sortNewTask=totalTasks;
-      }
-    } else{
-      sortNewTask=totalTasks;
-    }
-    
-    setTasks(sortNewTask);
-    setResetTasks(sortNewTask);
-    setNewTask({ title: '', description: '', dueDate: '', priority: 'low', completed: false });
-  } catch (err) {
-    console.log('Error creating task:', err);
-  }
-};
 
   const updateTask = async () => {
     try {
@@ -147,10 +110,12 @@ const createTask = async () => {
     }
   };
 
-  const handlePriorityChange = (event)=>{
-    setNewTask({...newTask, priority: event.target.value});
-   
-  }
+  const updateTaskList = (newTaskList) => {
+    setTasks(newTaskList);
+    fetchTasks();
+  };
+  
+
 
   const handleSortPriority=(sortedItems)=>{
     setTasks(sortedItems);
@@ -163,10 +128,6 @@ const createTask = async () => {
 
   }
 
-  const handleCancel=()=>{
-    setAddTask(false);
-    setNewTask({ title: '', description: '', dueDate:'', priority:'low', completed: false })
-  }
 
   const handleReset = () => {
     // Inside the click handler, set a flag to indicate that the reset button was clicked
@@ -182,27 +143,20 @@ const createTask = async () => {
   }, [fillter.state]);
   
 
+ const handleCancel=()=>{
+  setEditingTask(null);
+ }
   
   
-  
-
-  const handleDateTimeSelected = (dateTime) => {
-    setNewTask({...newTask, dueDate:dateTime});
-    
-  };
 
   return (
     <div>
       <h1>Task Management System</h1>
       <div className="header">
-       <div className='left'>
-         <Home />
-         <Search />
-       </div>
+       
        <div className='right'>
         <Filter tasks={tasks} onSortPriority={handleSortPriority} onSortDate={handleDateSort} onReset={handleReset} filterOn={()=>{setFilter({state:true}); }} sortType={(type)=>{setSortType({sortedType:type}); console.log(sortType);}}/>
-        <Progress />
-        <Profile />
+       
        </div>
         
       </div>
@@ -212,7 +166,7 @@ const createTask = async () => {
           {tasks.map(task => (
             <li key={task._id}>
  
-              {addTask || !editingTask || editingTask._id !== task._id ? (
+              { !editingTask || editingTask._id !== task._id ? (
                 <div className='Container'>
                 <div className='task'>
                   <div className='task-name'>
@@ -241,13 +195,13 @@ const createTask = async () => {
                       value={editingTask.description}
                       onChange={e => setEditingTask({ ...editingTask, description: e.target.value })}
                     />
-                    <select id="taskPriority" value={editingTask.priority}  onChange={(e)=> setEditingTask({ ...editingTask, priority: e.target.value })}>
+                    <select id="taskPriority" value={editingTask.priority} >
            
                       <option value="high">P1-Highest</option>
                       <option value="medium">P2-Medium</option>
                       <option value="low">P3-Low</option>
                     </select>
-                    <DueDateCalendar onDateTimeSelected={handleDateTimeSelected} onClick={(e)=> setEditingTask({ ...editingTask, dueDate: e.target.value })} className="due"/>
+                    <DueDateCalendar onDateTimeSelected={(date)=> setEditingTask({ ...editingTask, dueDate: date})} className="due"/>
                 
                     <button onClick={handleCancel}>Cancel</button>
          
@@ -262,38 +216,12 @@ const createTask = async () => {
 
      
       <div >
-       {!addTask && (<button onClick={()=>{setAddTask(true)} }>Add task</button>)}
-      { addTask && (
-        <div className='container'>
-          <input 
-            type="text"
-            placeholder="Task name"
-            value={newTask.title}
-            onChange={e => setNewTask({ ...newTask, title: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Desciption"
-            value={newTask.description}
-            onChange={e => setNewTask({ ...newTask, description: e.target.value })}
-          />
-        
-          <select id="taskPriority" value={newTask.priority}  onChange={handlePriorityChange}>
-           
-            <option value="high">P1-Highest</option>
-            <option value="medium">P2-Medium</option>
-            <option value="low">P3-Low</option>
-          </select>
-          <DueDateCalendar onDateTimeSelected={handleDateTimeSelected} className="due"/>
-      
-          <button onClick={handleCancel}>Cancel</button>
-          <button onClick={createTask}>Create Task</button>
-          
-        </div>
-        
-
-       )}
-
+        <Task tasks={[tasks]} 
+        fillter={fillter}
+         sortType={sortType} 
+         sortTasksByPriority={sortTasksByPriority} 
+         sortByDueDate={sortByDueDate} 
+          updateTaskList={updateTaskList} />
       </div>
       
       

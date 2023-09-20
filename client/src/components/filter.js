@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import './filter.css';
 
 export default function Filter({tasks, onSortPriority, onSortDate, onReset, filterOn, sortType}) {
     const [filter, setFilter]=useState(false);
@@ -49,21 +50,21 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
 
   return (
     <div>
-       <button onClick={()=>setFilter(true)}>Filter</button>
+       {!filter && (<button onClick={()=>setFilter(true)}>Filter</button>)}
        {
         filter && (
-            <div>
+            <section className='filter'>
                 <div >
                     <h2>Sort by </h2>
-                    <span onClick={sortPriority}>Priority</span> <br />
-                    <span onClick={sortByDate}>Due date</span>
+                    <button className='filters' onClick={sortPriority}>Priority</button> <br />
+                    <button className='filters' onClick={sortByDate}>Due date</button>
 
                 </div>
                 <div>
                 <br></br>
                     <button onClick={resetTasks}>Reset all</button>
                 </div>
-            </div>
+            </section>
             
         )
        }
