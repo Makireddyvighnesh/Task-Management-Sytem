@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import './filter.css';
 
 export default function Filter({tasks, onSortPriority, onSortDate, onReset, filterOn, sortType}) {
-    const [filter, setFilter]=useState(false);
+    const [filterVisible, setFilterVisible] = useState(false);
     const customPriorityOrder=['high', 'medium', 'low'];
+    const ref=useRef(null);
     const sortPriority=()=>{
        const sortedItems = [...tasks].sort((a,b)=>{
             const aOrder=customPriorityOrder.indexOf(a.priority);
@@ -14,7 +15,6 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
         });
         console.log(sortedItems);
         onSortPriority(sortedItems);
-        setFilter(false);
         filterOn();
         sortType("priority");
     }
@@ -37,38 +37,73 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
         });
     
         onSortDate(sortedDate);
-        setFilter(false);
         filterOn();
         sortType("dueDate");
     }
      const resetTasks = ()=>{
         onReset();
-        setFilter(false);
      }
+     const toggleFilter = () => {
+        setFilterVisible(!filterVisible);
+      }
 
+    
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (filterVisible && ref.current && !ref.current.contains(event.target)) {
+          // Clicked outside of the popup, close it
+          setFilterVisible(false);
+        }
+      }
 
+    // Add the event listener to the window
+    document.addEventListener('click', handleClickOutside, true);
 
-  return (
-    <div>
-       {!filter && (<button onClick={()=>setFilter(true)}>Filter</button>)}
-       {
-        filter && (
-            <section className='filter'>
-                <div >
-                    <h2>Sort by </h2>
-                    <button className='filters' onClick={sortPriority}>Priority</button> <br />
-                    <button className='filters' onClick={sortByDate}>Due date</button>
+    // Clean up the event listener when the component unmounts
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  });
+      
 
+     return (
+        <div className="filter-container">
+        <button onClick={toggleFilter}>Filter</button>
+        {filterVisible && (
+          <div className="filter-popup" ref={ref} style={{ display: filterVisible ? 'block' : 'none' }}>
+            <div className="filter-popup-content">
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ textAlign: 'left', marginBottom: '5px' }}>Sort</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <label>Sorting</label>
+                  <button  onClick={sortPriority}>
+                    Priority
+                  </button>
+                  <button  onClick={sortByDate}>
+                    Due Date
+                  </button>
                 </div>
-                <div>
-                <br></br>
-                    <button onClick={resetTasks}>Reset all</button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '5px' }}>
+                  <label>Grouping</label>
+                  <button >Priority</button>
+                  <button >Due Date</button>
                 </div>
-            </section>
-            
-        )
-       }
-    </div>
-  )
+              </div>
+  
+              <hr />
+              <div>
+                <h3 style={{ textAlign: 'left', marginBottom: '5px' }}>View</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Completed tasks</span>
+                </div>
+              </div>
+              <hr></hr>
+              <button style={{display:'flex'}} onClick={resetTasks}>Reset all</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+      
 }
 

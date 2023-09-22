@@ -7,7 +7,7 @@
     border-radius: 2%;
  }
  #taskPriority{
-    padding: 10px 20px;
+    padding: 7px 10px;
     font-weight: bold;
     color:#808080;
     margin:5px;
@@ -58,35 +58,34 @@
     display: flex;
   }
   
-
-  
  input {
      color: #808080;
      display: block;
      font-weight: bold;
      font-style: Sans-serif;
      border-width: 0;
+     font-size: 14px;
      height:30px;
      width:260px;
  }
  .due{
     display:inline;
  }
- button {
-border: 1px solid #ddd; /* Light border color */
-background-color: #fff; /* White background color */
-color: #808080; /* Default text color */
-font-weight: bold; /* Bold text */
+ /* button {
+border: 1px solid #ddd; 
+background-color: #fff; 
+color: #808080; 
+font-weight: bold; 
 padding: 10px 20px;
-border-radius: 5px; /* Rounded corners */
-cursor: pointer; /* Show pointer cursor on hover */
-transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+border-radius: 5px; 
+cursor: pointer; 
+transition: background-color 0.3s, color 0.3s; 
 }
 
 button:hover {
-background-color: #F0F0F0; /* Light black background on hover */
-color: black; /* White text color on hover */
-}
+background-color: #F0F0F0; 
+color: black;
+} */
 
  input:focus {
      outline:none;

@@ -6,30 +6,22 @@ export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPri
     const setDefault=()=>{
         const now = new Date();
         const curr=new Date(now.getTime() + 12 * 60 * 60 * 1000);
-        
         return curr;
       }
-      
-
       const [newTask, setNewTask] = useState({ title: '', description: '', dueDate:setDefault(), priority:'low', completed: false });
       const [add, setAdd]=useState(false);
-    
       const handleDateTimeSelected = (dateTime) => {
         setNewTask({...newTask, dueDate:dateTime});     
       };
-
       const handlePriorityChange = (event)=>{
         setNewTask({...newTask, priority: event.target.value});
       }
-
       const handleCancel=()=>{
        setAdd(false);
        setNewTask({ title: '', description: '', dueDate:'', priority:'low', completed: false })
       }
-
       const createTask = async () => {
         setAdd(false);
-        
         try {
           const response = await axios.post('http://localhost:8080/api/tasks', newTask);
           const totalTasks=[...tasks,response.data];
@@ -45,9 +37,7 @@ export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPri
           } else{
             sortNewTask=totalTasks;
           }
-          
           updateTaskList(sortNewTask);
-          
         //   taskAdded();
           setNewTask({ title: '', description: '', dueDate: '', priority: 'low', completed: false });
         } catch (err) {
@@ -80,8 +70,8 @@ export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPri
           </select>
           <DueDateCalendar onDateTimeSelected={handleDateTimeSelected} className="due"/>
       
-          <button onClick={handleCancel}>Cancel</button>
-          <button onClick={createTask}>Create Task</button>
+          <button style={{padding:'10px'}} onClick={handleCancel}>Cancel</button>
+          <button style={{padding:'10px'}} onClick={createTask}>Create Task</button>
          
         </div>
         )}

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Filter from './filter.js';
 import DueDateCalendar from './DueDateCalender.js';
 import Task from './addTask.js';
-
+import './TaskList.css';
 function TaskList() {
  
 
@@ -154,7 +154,7 @@ const fetchTasks = async () => {
       <h1>Task Management System</h1>
       <div className="header">
        
-       <div className='right'>
+       <div >
         <Filter tasks={tasks} onSortPriority={handleSortPriority} onSortDate={handleDateSort} onReset={handleReset} filterOn={()=>{setFilter({state:true}); }} sortType={(type)=>{setSortType({sortedType:type}); console.log(sortType);}}/>
        
        </div>
@@ -183,7 +183,7 @@ const fetchTasks = async () => {
                  
                 </div>
               ) : (
-                <div>
+                <div className='editTask'>
                 <form >
                     <input
                       type="text"
@@ -195,7 +195,7 @@ const fetchTasks = async () => {
                       value={editingTask.description}
                       onChange={e => setEditingTask({ ...editingTask, description: e.target.value })}
                     />
-                    <select id="taskPriority" value={editingTask.priority} >
+                    <select id="taskPriority" onChange={e=>setEditingTask({...editingTask, priority:e.target.value})} value={editingTask.priority} >
            
                       <option value="high">P1-Highest</option>
                       <option value="medium">P2-Medium</option>
@@ -203,9 +203,9 @@ const fetchTasks = async () => {
                     </select>
                     <DueDateCalendar onDateTimeSelected={(date)=> setEditingTask({ ...editingTask, dueDate: date})} className="due"/>
                 
-                    <button onClick={handleCancel}>Cancel</button>
+                    <button className='edit' onClick={handleCancel}>Cancel</button>
          
-                    <button onClick={updateTask}>Save</button>
+                    <button className='edit' onClick={updateTask}>Save</button>
                   </form>
                 </div>
               )}
