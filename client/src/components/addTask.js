@@ -2,7 +2,7 @@ import React,{useState} from 'react'
 import axios from 'axios';
 import DueDateCalendar from './DueDateCalender';
 
-export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPriority, sortByDueDate,  updateTaskList}) {
+export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPriority, sortByDueDate,  addTaskList}) {
     const setDefault=()=>{
         const now = new Date();
         const curr=new Date(now.getTime() + 12 * 60 * 60 * 1000);
@@ -25,6 +25,7 @@ export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPri
         try {
           const response = await axios.post('http://localhost:8080/api/tasks', newTask);
           const totalTasks=[...tasks,response.data];
+          console.log(totalTasks);
           let sortNewTask;
           if(fillter.state){
             if(sortType.sortedType==='priority'){
@@ -37,7 +38,7 @@ export default function Task({tasks, fillter,sortType, tasksList, sortTasksByPri
           } else{
             sortNewTask=totalTasks;
           }
-          updateTaskList(sortNewTask);
+          addTaskList(sortNewTask);
         //   taskAdded();
           setNewTask({ title: '', description: '', dueDate: '', priority: 'low', completed: false });
         } catch (err) {

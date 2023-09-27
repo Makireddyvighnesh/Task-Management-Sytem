@@ -1,26 +1,101 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './filter.css';
 
-export default function Filter({tasks, onSortPriority, onSortDate, onReset, filterOn, sortType}) {
+export default function Filter({sortType, tasks, onSortPriority, onSortDate, onReset,onGroup, filterOn, sortingType}) {
     const [filterVisible, setFilterVisible] = useState(false);
     const customPriorityOrder=['high', 'medium', 'low'];
     const ref=useRef(null);
+
+
     const sortPriority=()=>{
-       const sortedItems = [...tasks].sort((a,b)=>{
-            const aOrder=customPriorityOrder.indexOf(a.priority);
-            const bOrder=customPriorityOrder.indexOf(b.priority);
-            if(aOrder===-1) return 1;
-            if(bOrder===-1) return -1;
-            return aOrder-bOrder;
-        });
-        console.log(sortedItems);
-        onSortPriority(sortedItems);
-        filterOn();
-        sortType("priority");
+      if(sortType==='Grouping'){
+
+      }  else{
+        const sortedItems = [...tasks].sort((a,b)=>{
+          const aOrder=customPriorityOrder.indexOf(a.priority);
+          const bOrder=customPriorityOrder.indexOf(b.priority);
+          if(aOrder===-1) return 1;
+          if(bOrder===-1) return -1;
+          return aOrder-bOrder;
+      });
+      console.log(sortedItems);
+      onSortPriority(sortedItems);
+      filterOn();
+      sortingType("priority");
+      }
+       
     }
    
+    const handleTasksByGroupP=()=>{
+      
+      const highPriorityTasks=tasks.filter(task=>task.priority==='high');
+      const mediumPriorityTasks=tasks.filter(task=>task.priority==='medium');
+      const lowPriorityTasks=tasks.filter(task=>task.priority==='low');
+      
+      const priorityGroup={
+        'Priority 1':highPriorityTasks,
+        'Priority 2':mediumPriorityTasks,
+        'Priority 3':lowPriorityTasks
+      }
+      onGroup(priorityGroup);
+      console.log(priorityGroup);
+      sortingType('Grouping');
+    }
 
-    const sortByDate = () => {
+    const handleTasksByGroupDue = () => {
+      const dueGroup = {};
+      const currDate = new Date();
+    
+      tasks.forEach((task) => {
+        const dueDate = new Date(task.dueDate);
+    
+        const timeDiff = dueDate - currDate;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+        const dayOfWeek = dueDate.toLocaleString('en-US', { weekday: 'long' });
+        const month = (dueDate.toLocaleString('en-US', { month: 'long' })).slice(0, 3);
+    
+        const date = dueDate.getDate();
+        const year = dueDate.getFullYear();
+        let groupKey;
+    
+        if (daysRemaining < 2) {
+          groupKey = `${date} ${month} Tomorrow`;
+        } else if (daysRemaining < 8) {
+          groupKey = `${date} ${month} ${dayOfWeek}`;
+        } else {
+          groupKey = `${date} ${month} ${year}`;
+        }
+    
+        if (!dueGroup[groupKey]) {
+          dueGroup[groupKey] = [];
+        }
+        dueGroup[groupKey].push(task);
+      });
+    
+      let sortKeys = Object.keys(dueGroup);
+    
+      sortKeys.sort((key1, key2) => {
+        const taskDate1 = new Date(key1);
+        const taskDate2 = new Date(key2);
+        const leftDays1 = Math.abs(taskDate1 - currDate);
+        const leftDays2 = Math.abs(taskDate2 - currDate);
+    
+        return leftDays1 - leftDays2;
+      });
+    
+      const sortedDueGroup = {};
+      sortKeys.forEach((key) => {
+        sortedDueGroup[key] = dueGroup[key];
+      });
+    
+      console.log(sortedDueGroup);
+    
+      onGroup(sortedDueGroup);
+      sortingType('Grouping');
+    };
+    
+
+    const sortByDate = () =>{
         const sortedDate = tasks.slice().sort((task1, task2) => {
             const date1 = new Date(task1.dueDate);
             const date2 = new Date(task2.dueDate);
@@ -38,7 +113,7 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
     
         onSortDate(sortedDate);
         filterOn();
-        sortType("dueDate");
+        sortingType("dueDate");
     }
      const resetTasks = ()=>{
         onReset();
@@ -51,16 +126,13 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
   useEffect(() => {
     const handleClickOutside = (event) => {
         if (filterVisible && ref.current && !ref.current.contains(event.target)) {
-          // Clicked outside of the popup, close it
           setFilterVisible(false);
         }
       }
 
-    // Add the event listener to the window
-    document.addEventListener('click', handleClickOutside, true);
+        document.addEventListener('click', handleClickOutside, true);
 
-    // Clean up the event listener when the component unmounts
-    return () => {
+      return () => {
       document.removeEventListener('click', handleClickOutside, true);
     };
   });
@@ -85,8 +157,8 @@ export default function Filter({tasks, onSortPriority, onSortDate, onReset, filt
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '5px' }}>
                   <label>Grouping</label>
-                  <button >Priority</button>
-                  <button >Due Date</button>
+                  <button onClick={handleTasksByGroupP}>Priority</button>
+                  <button onClick={handleTasksByGroupDue}>Due Date</button>
                 </div>
               </div>
   

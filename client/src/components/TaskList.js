@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import EditTask from './editTask.js';
 import Filter from './filter.js';
 import DueDateCalendar from './DueDateCalender.js';
 import Task from './addTask.js';
@@ -8,6 +9,8 @@ function TaskList() {
  
 
   const [tasks, setTasks] = useState([]);
+  const [groupedTasks, setGroupedTasks] = useState({});
+
   const [editingTask, setEditingTask] = useState(null);
 
   const [sortType, setSortType]=useState(()=>{
@@ -27,6 +30,13 @@ function TaskList() {
     fetchTasks();
   },[]);
 
+  const handleSortType=(type)=>{
+    setSortType({sortedType:type});
+     console.log(sortType);
+  }
+  // useEffect(()=>{
+  //   handleSortType();
+  // })
 
 
  useEffect(()=>{
@@ -62,8 +72,25 @@ return [...tasks].slice().sort((task1, task2) => {
 })
 };
 
+const handleTasksByGroupP=(tasks)=>{
+      console.log("called ")
+  const highPriorityTasks=tasks.filter(task=>task.priority==='high');
+  const mediumPriorityTasks=tasks.filter(task=>task.priority==='medium');
+  const lowPriorityTasks=tasks.filter(task=>task.priority==='low');
+  
+  const priorityGroup={
+    'Priority 1':highPriorityTasks,
+    'Priority 2':mediumPriorityTasks,
+    'Priority 3':lowPriorityTasks
+  }
+  
+ 
+  console.log(priorityGroup);
+  return priorityGroup;
+}
+
 const fetchTasks = async () => {
-  console.log(tasks);
+  console.log(sortType,'1');
   try {
     const response = await axios.get('http://localhost:8080/api/tasks');
     // const sortedTasks = fillter.state ? sortTasksByPriority(response.data) : response.data;
@@ -74,7 +101,15 @@ const fetchTasks = async () => {
        
       } else if(sortType.sortedType==="dueDate"){
         sortedTasks=sortByDueDate(response.data);
-      } else{
+      } else if(sortType.sortedType==="Grouping"){
+        sortedTasks=response.data;
+        
+        console.log("before");
+        setGroupedTasks(handleTasksByGroupP(sortedTasks));
+        
+        console.log("after");
+      }
+      else{
         sortedTasks=response.data;
       }
     } else{
@@ -93,8 +128,11 @@ const fetchTasks = async () => {
     try {
       const response = await axios.put(`http://localhost:8080/api/tasks/${editingTask._id}`, editingTask);
       const updatedTasks = tasks.map(task => task._id === editingTask._id ? response.data : task);
-      setTasks(updatedTasks);
-      setEditingTask(null);
+      setTasks(updatedTasks)
+      .then(()=>{
+        setEditingTask(null);
+      })
+      
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -102,15 +140,20 @@ const fetchTasks = async () => {
 
   const deleteTask = async (taskId) => {
     try {
+      console.log(taskId);
       await axios.delete(`http://localhost:8080/api/tasks/${taskId}`);
-      const updatedTasks = tasks.filter(task => task._id !== taskId);
-      setTasks(updatedTasks);
+      const response=await fetchTasks()
+      .then((response)=>{
+        setTasks(response.data);
+      })
+     
+      
     } catch (error) {
       console.error('Error deleting task:', error);
     }
   };
 
-  const updateTaskList = (newTaskList) => {
+  const addTaskList = (newTaskList) => {
     setTasks(newTaskList);
     fetchTasks();
   };
@@ -128,6 +171,8 @@ const fetchTasks = async () => {
 
   }
 
+  const handleEditTitle=(value)=> setEditingTask({ ...editingTask, title: value })
+  const handleEditDesc=(value)=> setEditingTask({ ...editingTask, description: value })
 
   const handleReset = () => {
     // Inside the click handler, set a flag to indicate that the reset button was clicked
@@ -155,14 +200,49 @@ const fetchTasks = async () => {
       <div className="header">
        
        <div >
-        <Filter tasks={tasks} onSortPriority={handleSortPriority} onSortDate={handleDateSort} onReset={handleReset} filterOn={()=>{setFilter({state:true}); }} sortType={(type)=>{setSortType({sortedType:type}); console.log(sortType);}}/>
+        <Filter sortType={sortType} tasks={tasks} onSortPriority={handleSortPriority} onSortDate={handleDateSort} onGroup={(tasks)=>setGroupedTasks(tasks)} onReset={handleReset} filterOn={()=>{setFilter({state:true}); }} sortingType={handleSortType}/>
        
        </div>
         
       </div>
       <div>
         <h2>Task List</h2>
+        { sortType.sortedType === "Grouping" && Object.keys(groupedTasks).map(priority => (
+  <div key={priority}>
+    {Array.isArray(groupedTasks[priority]) && groupedTasks[priority].length > 0 && (
+      <>
+        <h2>{priority}</h2>
         <ul>
+          {groupedTasks[priority].map(task => (
+            <li key={task._id}>
+            {!editingTask || editingTask._id !== task._id ?(
+              <div className='Container'>
+                <div className='task'>
+                  <div className='task-name'>
+                    <strong>{task.title}</strong>
+                  </div>
+                  <div className='buttonLayout hide'>
+                    <button onClick={() => setEditingTask(task)}>Edit</button>
+                    <button onClick={() => deleteTask(task._id)}>Delete</button>
+                  </div>
+                </div>
+                <p>{task.description}</p>
+              </div>
+            ): (
+              <EditTask editingTask={editingTask} handleEditTitle={handleEditTitle} updateTask={updateTask} handleEditDesc={handleEditDesc} handleEditDate={(date)=> setEditingTask({ ...editingTask, dueDate: date})} cancel={handleCancel}/>
+            )
+            }
+             
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </div>
+))}
+
+
+        {sortType.sortedType!="Grouping" && <ul>
           {tasks.map(task => (
             <li key={task._id}>
  
@@ -211,7 +291,7 @@ const fetchTasks = async () => {
               )}
             </li>
           ))}
-        </ul>
+        </ul>}
       </div>
 
      
@@ -221,7 +301,7 @@ const fetchTasks = async () => {
          sortType={sortType} 
          sortTasksByPriority={sortTasksByPriority} 
          sortByDueDate={sortByDueDate} 
-          updateTaskList={updateTaskList} />
+          addTaskList={addTaskList} />
       </div>
       
       
