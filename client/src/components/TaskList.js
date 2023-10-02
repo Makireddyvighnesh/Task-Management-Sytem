@@ -55,6 +55,10 @@ function TaskList() {
   });
 };
 
+const handleAddSection=()=>{
+  console.log("Hi");
+}
+
 const sortByDueDate = (tasks)=>{
 return [...tasks].slice().sort((task1, task2) => {
   const date1 = new Date(task1.dueDate);
@@ -304,6 +308,10 @@ const fetchTasks = async () => {
           addTaskList={addTaskList} />
       </div>
       
+      <div>
+        <button className='addSec' onClick={handleAddSection}>Add section</button>
+
+      </div>
       
     </div>
   );
