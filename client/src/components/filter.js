@@ -73,9 +73,13 @@ export default function Filter({sortType, tasks, onSortPriority, onSortDate, onR
       });
     
       let sortKeys = Object.keys(dueGroup);
+      console.log("hi")
     
       sortKeys.sort((key1, key2) => {
+        if(key1.includes("Tomorrow")) return -1;
+        if(key2.includes("Tomorrow")) return -1;
         const taskDate1 = new Date(key1);
+      
         const taskDate2 = new Date(key2);
         const leftDays1 = Math.abs(taskDate1 - currDate);
         const leftDays2 = Math.abs(taskDate2 - currDate);
