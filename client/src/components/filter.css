@@ -1,66 +1,73 @@
 /* Position the filter container */
 .filter-container {
 
-    background-color: #fff;
-    position: relative;
-    display: inline-block; /* To ensure the button and popup are in-line */
-  }
-  
-  .sort{
-    padding-left: 5px;
-    border: none;
-  }
-  /* Styles for the "Filter" button */
-  button {
-    background-color: white; /* Button background color */
-    color:gray; /* Button text color */
-    border: none;
-    padding: 0;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    color:#B4B4B3 ; /* Hover color */
-  }
-  
-  /* Styles for the filter popup */
-  .filter-popup {
-    position: absolute;
-    top: calc(100% + 10px); /* Position the popup below the button */
-    left: 0;
-    margin-bottom: 10px;
-    display: none;
-    background-color: #fff; /* Popup background color */
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000; /* Ensure the popup is above other content */
-    width:250px;
-    height:260px;
-  }
-  h3{
-     text-align: 'left';
-      margin-bottom: '5px' ;
-  }
-  /* Styles for the filter popup content */
-  .filter-popup-content {
-    text-align: center;
-  }
-  
-  /* Styles for the filter buttons in the popup */
-  .filters {
-    background-color: transparent; /* Button background color */
-    color:#B4B4B3; /* Button text color */
-    border: none;
-    padding: 0;
-    margin: 0;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  
-  .filters:hover {
-    background-color:#B4B4B3 ;
-    color: white; /* Hover color */
-  }
-  
+ 
+  position: relative;
+  display: inline-block; /* To ensure the button and popup are in-line */
+}
+
+.filterButton{
+  background-color: #f1f1f1;
+  color: black;
+  padding-top: 10px;
+}
+.filterButton:hover{
+  color:red
+}
+.sort{
+  padding-left: 5px;
+  border: none;
+}
+/* Styles for the "Filter" button */
+button {
+  background-color: white; /* Button background color */
+  color:gray; /* Button text color */
+  border: none;
+  padding: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  color:#B4B4B3 ; /* Hover color */
+}
+
+/* Styles for the filter popup */
+.filter-popup {
+  position: absolute;
+  top: calc(100% + 10px); /* Position the popup below the button */
+  left: 0;
+  margin-bottom: 10px;
+  display: none;
+  background-color: #fff; /* Popup background color */
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000; /* Ensure the popup is above other content */
+  width:250px;
+  height:260px;
+}
+h3{
+   text-align: 'left';
+    margin-bottom: '5px' ;
+}
+/* Styles for the filter popup content */
+.filter-popup-content {
+  text-align: center;
+}
+
+/* Styles for the filter buttons in the popup */
+.filters {
+  background-color: transparent; /* Button background color */
+  color:#B4B4B3; /* Button text color */
+  border: none;
+  padding: 0;
+  margin: 0;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.filters:hover {
+  background-color:#B4B4B3 ;
+  color: white; /* Hover color */
+}

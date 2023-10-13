@@ -1,0 +1,13 @@
+.edit{
+    padding: 10px 20px;
+}
+
+.editTask{
+
+    border: 1px solid lightgray;
+    padding: 10px 2px 10px 10px;
+    width:50%;
+    border-radius: 2%;
+}
+
+

@@ -59,7 +59,7 @@ export default function Filter({sortType, tasks, onSortPriority, onSortDate, onR
         let groupKey;
     
         if (daysRemaining < 2) {
-          groupKey = `${date} ${month} Tomorrow`;
+          groupKey = ` Tomorrow`;
         } else if (daysRemaining < 8) {
           groupKey = `${date} ${month} ${dayOfWeek}`;
         } else {
@@ -92,7 +92,7 @@ export default function Filter({sortType, tasks, onSortPriority, onSortDate, onR
         sortedDueGroup[key] = dueGroup[key];
       });
     
-      console.log(sortedDueGroup);
+      console.log("sorted",sortedDueGroup);
     
       onGroup(sortedDueGroup);
       sortingType('Grouping');
@@ -144,7 +144,8 @@ export default function Filter({sortType, tasks, onSortPriority, onSortDate, onR
 
      return (
         <div className="filter-container">
-        <button onClick={toggleFilter}>Filter</button>
+        
+        <button className="filterButton" onClick={toggleFilter}>Filter</button>
         {filterVisible && (
           <div className="filter-popup" ref={ref} style={{ display: filterVisible ? 'block' : 'none' }}>
             <div className="filter-popup-content">
